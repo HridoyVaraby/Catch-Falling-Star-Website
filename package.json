@@ -1,0 +1,22 @@
+{
+  "name": "catch-falling-star-landing",
+  "version": "1.0.0",
+  "description": "Landing page for Catch Falling Star mobile game",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npx tailwindcss -i ./src/input.css -o ./dist/output.css --watch",
+    "build": "npx tailwindcss -i ./src/input.css -o ./dist/output.css"
+  },
+  "keywords": [
+    "game",
+    "mobile game",
+    "landing page"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.17"
+  }
+}
