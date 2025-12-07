@@ -4,117 +4,524 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Catch Falling Star - Mobile Game</title>
-  <meta name="description" content="A fun and challenging game where you catch falling stars while avoiding debris.">
+  <meta name="description" content="A cosmic adventure where you catch falling stars while avoiding debris. Experience stunning visuals and addictive gameplay!">
+
   <!-- Favicon -->
   <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon/favicon.ico">
   <link rel="icon" type="image/svg+xml" href="./assets/favicon/favicon.svg">
   <link rel="manifest" href="./assets/favicon/site.webmanifest">
-  <!-- Stylesheets -->
-  <link rel="stylesheet" href="./dist/output.css">
-  <link rel="stylesheet" href="./src/video-modal.css">
+
+  <!-- Preconnect for performance -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@100;200;300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body class="relative overflow-x-hidden">
-  <!-- Background Stars -->
-  <div class="fixed inset-0 z-0 overflow-hidden">
-    <div id="stars-container" class="absolute inset-0"></div>
-  </div>
 
-  <!-- Enhanced Header -->
-  <header class="relative z-10 py-6 px-6 md:px-12 lg:px-20">
-    <nav class="flex justify-between items-center">
-      <a href="index.html" class="flex items-center group">
-        <img src="./assets/images/logo.png" alt="Catch Falling Star Logo" class="h-10 mr-3 w-auto object-contain transition-transform duration-300 group-hover:scale-110 glow">
-        <div class="text-2xl font-bold text-highlight tracking-wide">Catch Falling Star</div>
-      </a>
-      <div class="hidden md:flex space-x-8">
-        <a href="#features" class="nav-link text-white/80 hover:text-white">Features</a>
-        <a href="#gameplay" class="nav-link text-white/80 hover:text-white">Gameplay</a>
-        <a href="#download" class="nav-link text-white/80 hover:text-white">Download</a>
-        <a href="privacy-policy.html" class="nav-link text-white/80 hover:text-white">Privacy Policy</a>
+  <!-- Enhanced Typography -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Orbitron:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- GSAP CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="./dist/output.css">
+  <style>
+    /* Custom CSS Variables */
+    :root {
+      --glow-intensity: 0 0 30px rgba(251, 191, 36, 0.8);
+      --card-glow: 0 0 40px rgba(99, 102, 241, 0.3);
+      --text-glow: 0 0 20px rgba(251, 191, 36, 0.5);
+    }
+
+    /* Base Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Space Mono', monospace;
+      background: var(--gradient-void);
+      color: #ffffff;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Enhanced Starfield Background */
+    #starfield {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle 3s infinite;
+    }
+
+    /* Animated Gradient Overlay */
+    .gradient-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.2) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 50%),
+                  radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.1) 0%, transparent 70%);
+      z-index: 1;
+      pointer-events: none;
+      animation: drift 20s ease-in-out infinite;
+    }
+
+    /* Glass Morphism Effects */
+    .glass {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .glass-heavy {
+      background: rgba(10, 14, 27, 0.8);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Typography Enhancements */
+    .font-display {
+      font-family: 'Bebas Neue', cursive;
+      letter-spacing: 0.05em;
+    }
+
+    .text-glow {
+      text-shadow: var(--text-glow);
+    }
+
+    .text-glow-stellar {
+      text-shadow: 0 0 30px rgba(251, 191, 36, 0.8);
+    }
+
+    /* Button Styles */
+    .btn-primary {
+      background: var(--gradient-stellar);
+      color: var(--cosmic-void);
+      font-weight: 700;
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--glow-intensity);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn-primary:hover::before {
+      left: 100%;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 0 50px rgba(251, 191, 36, 0.9);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: white;
+      font-weight: 600;
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--star-yellow);
+      color: var(--star-yellow);
+      transform: translateY(-2px);
+    }
+
+    /* Card Styles */
+    .feature-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 2rem;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, transparent, rgba(251, 191, 36, 0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .feature-card:hover::before {
+      opacity: 1;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: var(--card-glow);
+      border-color: rgba(251, 191, 36, 0.3);
+    }
+
+    /* Phone Mockup Styles */
+    .phone-mockup {
+      width: 300px;
+      height: 600px;
+      background: linear-gradient(145deg, #1a1a2e, #0f0f23);
+      border-radius: 40px;
+      padding: 12px;
+      box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        var(--cosmic);
+      position: relative;
+      transform-style: preserve-3d;
+    }
+
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      border-radius: 30px;
+      overflow: hidden;
+      position: relative;
+      background: #000;
+    }
+
+    .phone-notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 25px;
+      background: #000;
+      border-radius: 0 0 15px 15px;
+      z-index: 10;
+    }
+
+    /* Floating Elements */
+    .floating-star {
+      position: absolute;
+      color: var(--star-yellow);
+      animation: float 4s ease-in-out infinite;
+      opacity: 0.8;
+      filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.8));
+    }
+
+    /* Shooting Star Animation */
+    .shooting-star {
+      position: fixed;
+      width: 4px;
+      height: 4px;
+      background: white;
+      border-radius: 50%;
+      animation: shooting 1s linear;
+      box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.8);
+    }
+
+    .shooting-star::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 200px;
+      height: 2px;
+      background: linear-gradient(90deg, white, transparent);
+      transform: translateX(-100%);
+    }
+
+    @keyframes shooting {
+      0% {
+        transform: translateX(0) translateY(0);
+        opacity: 1;
+      }
+      100% {
+        transform: translateX(-500px) translateY(300px);
+        opacity: 0;
+      }
+    }
+
+    /* Mobile Menu */
+    .mobile-menu {
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .mobile-menu.active {
+      transform: translateX(0);
+    }
+
+    /* Animations */
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0) rotate(0deg);
+      }
+      50% {
+        transform: translateY(-20px) rotate(180deg);
+      }
+    }
+
+    @keyframes twinkle {
+      0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.3;
+        transform: scale(0.8);
+      }
+    }
+
+    @keyframes drift {
+      0%, 100% {
+        transform: rotate(0deg) scale(1);
+      }
+      33% {
+        transform: rotate(120deg) scale(1.1);
+      }
+      66% {
+        transform: rotate(240deg) scale(0.9);
+      }
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: -1000px 0;
+      }
+      100% {
+        background-position: 1000px 0;
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .phone-mockup {
+        width: 240px;
+        height: 480px;
+      }
+
+      .feature-card {
+        padding: 1.5rem;
+      }
+    }
+
+    /* Loading Animation */
+    .loader {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top-color: var(--star-yellow);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Scroll Progress Bar */
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      background: var(--gradient-stellar);
+      z-index: 9999;
+      transition: width 0.1s;
+    }
+
+    /* Hidden elements for animation */
+    .hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    /* Custom Cursor */
+    .cursor-glow {
+      position: fixed;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(251, 191, 36, 0.8), transparent);
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s ease;
+    }
+  </style>
+</head>
+<body>
+  <!-- Progress Bar -->
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- Animated Background -->
+  <div id="starfield"></div>
+  <div class="gradient-overlay"></div>
+
+  <!-- Custom Cursor (Desktop Only) -->
+  <div class="cursor-glow hidden md:block" id="cursorGlow"></div>
+
+  <!-- Navigation -->
+  <header class="fixed top-0 left-0 right-0 z-50 glass-heavy">
+    <nav class="container mx-auto px-6 py-4">
+      <div class="flex justify-between items-center">
+        <!-- Logo -->
+        <a href="#hero" class="flex items-center space-x-3 group">
+          <div class="w-12 h-12 rounded-full bg-gradient-stellar flex items-center justify-center transform transition-transform group-hover:rotate-12">
+            <i class="fas fa-star text-cosmic-void text-xl"></i>
+          </div>
+          <span class="font-display text-2xl text-star-yellow">CATCH FALLING STAR</span>
+        </a>
+
+        <!-- Desktop Navigation -->
+        <div class="hidden lg:flex items-center space-x-8">
+          <a href="#features" class="nav-link text-white/80 hover:text-star-yellow transition-colors">Features</a>
+          <a href="#how-to-play" class="nav-link text-white/80 hover:text-star-yellow transition-colors">How to Play</a>
+          <a href="#screenshots" class="nav-link text-white/80 hover:text-star-yellow transition-colors">Screenshots</a>
+          <a href="#download" class="btn-primary text-sm px-6 py-2">
+            <i class="fab fa-google-play"></i>
+            Download
+          </a>
+        </div>
+
+        <!-- Mobile Menu Toggle -->
+        <button id="mobileMenuToggle" class="lg:hidden text-white/80 hover:text-star-yellow transition-colors">
+          <i class="fas fa-bars text-2xl"></i>
+        </button>
       </div>
-      <button id="mobile-menu-btn" class="md:hidden text-2xl text-white/80 hover:text-white transition-colors">
-        <i class="fas fa-bars"></i>
-      </button>
+
+      <!-- Mobile Menu -->
+      <div id="mobileMenu" class="mobile-menu fixed top-0 right-0 w-80 h-full glass-heavy p-8 lg:hidden">
+        <button id="mobileMenuClose" class="absolute top-6 right-6 text-white/60 hover:text-white">
+          <i class="fas fa-times text-2xl"></i>
+        </button>
+
+        <div class="mt-16 space-y-6">
+          <a href="#features" class="block text-xl text-white/80 hover:text-star-yellow transition-colors mobile-nav-link">Features</a>
+          <a href="#how-to-play" class="block text-xl text-white/80 hover:text-star-yellow transition-colors mobile-nav-link">How to Play</a>
+          <a href="#screenshots" class="block text-xl text-white/80 hover:text-star-yellow transition-colors mobile-nav-link">Screenshots</a>
+          <a href="#download" class="btn-primary w-full justify-center mobile-nav-link">Download Now</a>
+        </div>
+      </div>
     </nav>
-    
-    <!-- Enhanced Mobile Menu -->
-    <div id="mobile-menu" class="hidden md:hidden absolute top-20 right-6 glass p-6 rounded-2xl shadow-2xl z-50 w-64 border border-white/10">
-      <div class="flex flex-col space-y-6">
-        <a href="#features" class="text-white/80 hover:text-highlight transition-all duration-300 font-medium">Features</a>
-        <a href="#gameplay" class="text-white/80 hover:text-highlight transition-all duration-300 font-medium">Gameplay</a>
-        <a href="#download" class="text-white/80 hover:text-highlight transition-all duration-300 font-medium">Download</a>
-        <a href="privacy-policy.html" class="text-white/80 hover:text-highlight transition-all duration-300 font-medium">Privacy Policy</a>
-      </div>
-    </div>
   </header>
 
-  <!-- Enhanced Hero Section -->
-  <section class="relative z-10 min-h-screen flex items-center section">
-    <!-- Asymmetrical decorative elements -->
-    <div class="absolute top-20 left-10 w-32 h-32 bg-gradient-cosmic rounded-full blur-3xl opacity-20" data-parallax="0.3"></div>
-    <div class="absolute bottom-40 right-20 w-48 h-48 bg-gradient-stellar rounded-full blur-3xl opacity-20" data-parallax="0.5"></div>
+  <!-- Hero Section -->
+  <section id="hero" class="relative min-h-screen flex items-center justify-center pt-20">
+    <!-- Floating Decorative Elements -->
+    <div class="floating-star text-6xl" style="top: 20%; left: 10%; animation-delay: 0s;">
+      <i class="fas fa-star"></i>
+    </div>
+    <div class="floating-star text-4xl" style="top: 60%; right: 15%; animation-delay: 1s;">
+      <i class="fas fa-moon"></i>
+    </div>
+    <div class="floating-star text-5xl" style="top: 40%; left: 80%; animation-delay: 2s;">
+      <i class="fas fa-rocket"></i>
+    </div>
 
-    <div class="container mx-auto">
-      <div class="grid lg:grid-cols-12 gap-12 items-center">
-        <!-- Text content - off-center for asymmetry -->
-        <div class="lg:col-span-5 lg:col-start-2 order-2 lg:order-1">
-          <div class="space-y-8">
-            <div class="inline-flex items-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-4">
-              <span class="w-2 h-2 bg-highlight rounded-full mr-2 animate-pulse"></span>
-              <span class="text-sm font-medium">Mobile Gaming Experience</span>
+    <div class="container mx-auto px-6">
+      <div class="grid lg:grid-cols-2 gap-16 items-center">
+        <!-- Text Content -->
+        <div class="hero-content space-y-8">
+          <div class="badge inline-flex items-center px-4 py-2 rounded-full bg-star-yellow/20 border border-star-yellow/30">
+            <span class="w-2 h-2 bg-star-yellow rounded-full mr-2 animate-pulse"></span>
+            <span class="text-sm font-medium text-star-yellow">NOW AVAILABLE</span>
+          </div>
+
+          <h1 class="font-display text-6xl lg:text-8xl leading-none">
+            CATCH<br>
+            <span class="text-star-yellow text-glow-stellar">FALLING</span><br>
+            STAR
+          </h1>
+
+          <p class="text-lg lg:text-xl text-white/70 leading-relaxed max-w-lg">
+            Embark on an extraordinary cosmic adventure! Catch falling stars while avoiding dangerous debris in this addictive mobile game that tests your reflexes and strategic thinking.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a href="#download" class="btn-primary text-lg px-8 py-4 group">
+              <i class="fab fa-google-play text-xl"></i>
+              Get it on Google Play
+            </a>
+            <a href="#how-to-play" class="btn-secondary text-lg px-8 py-4">
+              <i class="fas fa-gamepad text-xl"></i>
+              How to Play
+            </a>
+          </div>
+
+          <!-- Stats -->
+          <div class="grid grid-cols-3 gap-8 pt-8 border-t border-white/10">
+            <div>
+              <div class="font-display text-3xl text-star-yellow" data-count="100">0K+</div>
+              <div class="text-sm text-white/60">Downloads</div>
             </div>
-
-            <h1 class="leading-tight mb-6">
-              Catch <span class="text-highlight">Falling</span><br>Star
-            </h1>
-
-            <p class="text-xl text-white/70 leading-relaxed max-w-lg">
-              Embark on an extraordinary cosmic adventure where you catch falling stars while avoiding space debris. Collect stars to increase your score and hearts to gain extra lives!
-            </p>
-
-            <div class="flex flex-col sm:flex-row gap-6 pt-4">
-              <a href="#download" class="btn btn-primary group">
-                <i class="fab fa-google-play mr-3 text-lg"></i>
-                Get it on Google Play
-              </a>
-              <a href="#gameplay" class="btn btn-secondary">
-                <i class="fas fa-gamepad mr-3 text-lg"></i>
-                How to Play
-              </a>
+            <div>
+              <div class="font-display text-3xl text-star-yellow" data-count="4.8">0.0★</div>
+              <div class="text-sm text-white/60">Rating</div>
             </div>
-
-            <!-- Additional stats -->
-            <div class="flex gap-8 pt-8 border-t border-white/10">
-              <div>
-                <div class="text-3xl font-bold text-highlight">100K+</div>
-                <div class="text-sm text-white/60">Downloads</div>
-              </div>
-              <div>
-                <div class="text-3xl font-bold text-highlight">4.8★</div>
-                <div class="text-sm text-white/60">Rating</div>
-              </div>
-              <div>
-                <div class="text-3xl font-bold text-highlight">50+</div>
-                <div class="text-sm text-white/60">Levels</div>
-              </div>
+            <div>
+              <div class="font-display text-3xl text-star-yellow" data-count="50">0+</div>
+              <div class="text-sm text-white/60">Levels</div>
             </div>
           </div>
         </div>
 
-        <!-- Phone mockup - larger and more prominent -->
-        <div class="lg:col-span-6 lg:col-start-8 order-1 lg:order-2 flex justify-center lg:justify-end">
-          <div class="relative w-80 h-[600px] phone-mockup float-animation">
-            <!-- Decorative rings -->
-            <div class="absolute -inset-4 rounded-3xl border-2 border-white/10 animate-pulse"></div>
-            <div class="absolute -inset-8 rounded-3xl border border-white/5"></div>
-
-            <div class="relative w-full h-full overflow-hidden rounded-2xl">
-              <img src="./assets/images/screenshot_startgame.png" alt="Game Screenshot" class="w-full h-full object-contain">
+        <!-- Phone Mockup -->
+        <div class="flex justify-center lg:justify-end">
+          <div class="phone-mockup" id="heroPhone">
+            <div class="phone-notch"></div>
+            <div class="phone-screen">
+              <img src="./assets/images/screenshot_startgame.png" alt="Game Screenshot" class="w-full h-full object-cover" loading="lazy">
+              <!-- Play Button Overlay -->
+              <div class="absolute inset-0 flex items-center justify-center bg-black/40">
+                <button class="w-20 h-20 rounded-full bg-star-yellow text-cosmic-void flex items-center justify-center transform transition-transform hover:scale-110 play-btn">
+                  <i class="fas fa-play text-2xl ml-1"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -122,379 +529,332 @@
     </div>
   </section>
 
-  <!-- Enhanced Features Section -->
-  <section id="features" class="relative z-10 section">
-    <!-- Background decoration -->
-    <div class="absolute top-0 left-1/4 w-96 h-96 bg-gradient-cosmic rounded-full blur-3xl opacity-10" data-parallax="0.2"></div>
-
-    <div class="container mx-auto">
+  <!-- Features Section -->
+  <section id="features" class="relative py-32">
+    <div class="container mx-auto px-6">
       <div class="text-center mb-20">
-        <div class="inline-flex items-center px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 mb-6">
-          <i class="fas fa-star text-highlight mr-2"></i>
-          <span class="text-sm font-medium">Game Features</span>
-        </div>
-        <h2 class="mb-6">
-          Discover Amazing <span class="text-highlight">Features</span>
+        <h2 class="font-display text-5xl lg:text-7xl mb-6">
+          GAME <span class="text-star-yellow text-glow-stellar">FEATURES</span>
         </h2>
-        <p class="text-xl text-white/60 max-w-2xl mx-auto">
-          Experience a captivating space adventure with carefully crafted gameplay mechanics
+        <p class="text-xl text-white/70 max-w-3xl mx-auto">
+          Experience an immersive cosmic adventure with carefully crafted gameplay mechanics and stunning visual effects
         </p>
       </div>
 
-      <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-        <!-- Feature 1 - Larger and emphasized -->
-        <div class="lg:col-span-3 md:col-span-2 card group">
-          <div class="flex items-start gap-6">
-            <div class="text-5xl text-highlight animate-pulse">
-              <i class="fas fa-star"></i>
-            </div>
-            <div class="flex-1">
-              <div class="flex items-center gap-3 mb-3">
-                <h3 class="text-2xl font-bold">Progressive Difficulty</h3>
-                <span class="px-3 py-1 bg-highlight/20 text-highlight rounded-full text-sm font-medium">Core Feature</span>
-              </div>
-              <p class="text-white/70 leading-relaxed text-lg">
-                The game dynamically adapts to your skill level, getting progressively harder as you play. This ensures you're always challenged and engaged, whether you're a beginner or experienced player!
-              </p>
-            </div>
+      <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-8">
+        <!-- Feature 1 -->
+        <div class="feature-card group">
+          <div class="text-5xl text-star-yellow mb-6 group-hover:animate-bounce">
+            <i class="fas fa-chart-line"></i>
           </div>
+          <h3 class="font-display text-2xl mb-4 group-hover:text-star-yellow transition-colors">Progressive Difficulty</h3>
+          <p class="text-white/70 leading-relaxed">
+            Master increasingly challenging levels that adapt to your skill level, ensuring endless entertainment
+          </p>
         </div>
 
         <!-- Feature 2 -->
-        <div class="card group">
-          <div class="text-4xl text-highlight mb-4 group-hover:animate-bounce">
-            <i class="fas fa-meteor"></i>
+        <div class="feature-card group">
+          <div class="text-5xl text-star-yellow mb-6 group-hover:animate-bounce">
+            <i class="fas fa-star"></i>
           </div>
-          <h3 class="text-xl font-bold mb-3">Multiple Star Types</h3>
+          <h3 class="font-display text-2xl mb-4 group-hover:text-star-yellow transition-colors">Multiple Star Types</h3>
           <p class="text-white/70 leading-relaxed">
-            Collect different types of stars with varying point values to maximize your score and achieve new high scores!
+            Collect various star types with unique values and special abilities to maximize your score
           </p>
         </div>
 
         <!-- Feature 3 -->
-        <div class="card group">
-          <div class="text-4xl text-highlight mb-4 group-hover:animate-bounce">
+        <div class="feature-card group">
+          <div class="text-5xl text-star-yellow mb-6 group-hover:animate-bounce">
             <i class="fas fa-trophy"></i>
           </div>
-          <h3 class="text-xl font-bold mb-3">High Score Tracking</h3>
+          <h3 class="font-display text-2xl mb-4 group-hover:text-star-yellow transition-colors">High Score Tracking</h3>
           <p class="text-white/70 leading-relaxed">
-            Compete with yourself and others by tracking your highest scores and climbing the global leaderboards!
+            Compete globally and track your progress with comprehensive leaderboards and achievements
           </p>
         </div>
 
         <!-- Feature 4 -->
-        <div class="card group">
-          <div class="text-4xl text-highlight mb-4 group-hover:animate-bounce">
+        <div class="feature-card group">
+          <div class="text-5xl text-star-yellow mb-6 group-hover:animate-bounce">
             <i class="fas fa-heart"></i>
           </div>
-          <h3 class="text-xl font-bold mb-3">Life System</h3>
+          <h3 class="font-display text-2xl mb-4 group-hover:text-star-yellow transition-colors">Life System</h3>
           <p class="text-white/70 leading-relaxed">
-            Collect hearts to gain extra lives and extend your gameplay sessions. Strategic collection is key to success!
+            Collect hearts to gain extra lives and extend your cosmic journey through the stars
           </p>
         </div>
 
         <!-- Feature 5 -->
-        <div class="card group">
-          <div class="text-4xl text-highlight mb-4 group-hover:animate-bounce">
+        <div class="feature-card group">
+          <div class="text-5xl text-star-yellow mb-6 group-hover:animate-bounce">
             <i class="fas fa-bolt"></i>
           </div>
-          <h3 class="text-xl font-bold mb-3">Power-Ups</h3>
+          <h3 class="font-display text-2xl mb-4 group-hover:text-star-yellow transition-colors">Power-Ups</h3>
           <p class="text-white/70 leading-relaxed">
-            Discover special power-ups that temporarily boost your abilities and help you catch more stars!
+            Discover special power-ups that temporarily boost your abilities and help you catch more stars
           </p>
         </div>
 
         <!-- Feature 6 -->
-        <div class="card group">
-          <div class="text-4xl text-highlight mb-4 group-hover:animate-bounce">
+        <div class="feature-card group">
+          <div class="text-5xl text-star-yellow mb-6 group-hover:animate-bounce">
             <i class="fas fa-palette"></i>
           </div>
-          <h3 class="text-xl font-bold mb-3">Cosmic Themes</h3>
+          <h3 class="font-display text-2xl mb-4 group-hover:text-star-yellow transition-colors">Cosmic Themes</h3>
           <p class="text-white/70 leading-relaxed">
-            Unlock stunning visual themes and backgrounds as you progress through the game!
+            Unlock stunning visual themes and backgrounds as you progress through your stellar adventure
           </p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Enhanced Gameplay Section -->
-  <section id="gameplay" class="relative z-10 section">
-    <!-- Background decoration -->
-    <div class="absolute top-1/4 right-1/4 w-64 h-64 bg-gradient-stellar rounded-full blur-3xl opacity-10" data-parallax="0.4"></div>
-
-    <div class="container mx-auto">
-      <div class="text-center mb-20">
-        <div class="inline-flex items-center px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 mb-6">
-          <i class="fas fa-gamepad text-highlight mr-2"></i>
-          <span class="text-sm font-medium">Gameplay Guide</span>
-        </div>
-        <h2 class="mb-6">
-          How to <span class="text-highlight">Play</span>
-        </h2>
-        <p class="text-xl text-white/60 max-w-2xl mx-auto">
-          Master the cosmic art of star catching with our intuitive gameplay mechanics
-        </p>
-      </div>
-
+  <!-- How to Play Section -->
+  <section id="how-to-play" class="relative py-32">
+    <div class="container mx-auto px-6">
       <div class="grid lg:grid-cols-2 gap-16 items-center">
         <!-- Steps -->
         <div class="space-y-8">
-          <div class="flex items-start gap-6 group">
-            <div class="bg-gradient-stellar text-cosmic-void rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0 mt-1 font-bold text-lg group-hover:scale-110 transition-transform">1</div>
-            <div class="flex-1">
-              <h3 class="text-2xl font-bold mb-3 group-hover:text-highlight transition-colors">Control the Basket</h3>
-              <p class="text-white/70 leading-relaxed text-lg">Use mouse or arrow keys to move the basket left and right to catch falling objects. Smooth, responsive controls for precise movements!</p>
+          <div class="step-item">
+            <div class="flex items-start gap-6">
+              <div class="w-16 h-16 rounded-full bg-gradient-stellar text-cosmic-void flex items-center justify-center flex-shrink-0 font-display text-2xl">
+                1
+              </div>
+              <div>
+                <h3 class="font-display text-3xl mb-3">Control the Basket</h3>
+                <p class="text-white/70 leading-relaxed">
+                  Use intuitive swipe controls or tilt your device to move the basket and catch falling objects
+                </p>
+              </div>
             </div>
           </div>
 
-          <div class="flex items-start gap-6 group">
-            <div class="bg-gradient-stellar text-cosmic-void rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0 mt-1 font-bold text-lg group-hover:scale-110 transition-transform">2</div>
-            <div class="flex-1">
-              <h3 class="text-2xl font-bold mb-3 group-hover:text-highlight transition-colors">Catch Stars</h3>
-              <p class="text-white/70 leading-relaxed text-lg">Catch falling stars to increase your score. Different stars have different point values - aim for the golden ones!</p>
+          <div class="step-item">
+            <div class="flex items-start gap-6">
+              <div class="w-16 h-16 rounded-full bg-gradient-stellar text-cosmic-void flex items-center justify-center flex-shrink-0 font-display text-2xl">
+                2
+              </div>
+              <div>
+                <h3 class="font-display text-3xl mb-3">Catch Golden Stars</h3>
+                <p class="text-white/70 leading-relaxed">
+                  Focus on collecting golden stars for maximum points while maintaining combo multipliers
+                </p>
+              </div>
             </div>
           </div>
 
-          <div class="flex items-start gap-6 group">
-            <div class="bg-gradient-stellar text-cosmic-void rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0 mt-1 font-bold text-lg group-hover:scale-110 transition-transform">3</div>
-            <div class="flex-1">
-              <h3 class="text-2xl font-bold mb-3 group-hover:text-highlight transition-colors">Avoid Debris</h3>
-              <p class="text-white/70 leading-relaxed text-lg">Stay alert and avoid catching space debris that reduces your score and can cost you precious lives!</p>
+          <div class="step-item">
+            <div class="flex items-start gap-6">
+              <div class="w-16 h-16 rounded-full bg-gradient-stellar text-cosmic-void flex items-center justify-center flex-shrink-0 font-display text-2xl">
+                3
+              </div>
+              <div>
+                <h3 class="font-display text-3xl mb-3">Avoid Space Debris</h3>
+                <p class="text-white/70 leading-relaxed">
+                  Stay alert and dodge dangerous asteroids that can damage your basket and end your run
+                </p>
+              </div>
             </div>
           </div>
 
-          <div class="flex items-start gap-6 group">
-            <div class="bg-gradient-stellar text-cosmic-void rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0 mt-1 font-bold text-lg group-hover:scale-110 transition-transform">4</div>
-            <div class="flex-1">
-              <h3 class="text-2xl font-bold mb-3 group-hover:text-highlight transition-colors">Collect Hearts</h3>
-              <p class="text-white/70 leading-relaxed text-lg">Gather hearts to gain extra lives and extend your cosmic journey through the stars!</p>
+          <div class="step-item">
+            <div class="flex items-start gap-6">
+              <div class="w-16 h-16 rounded-full bg-gradient-stellar text-cosmic-void flex items-center justify-center flex-shrink-0 font-display text-2xl">
+                4
+              </div>
+              <div>
+                <h3 class="font-display text-3xl mb-3">Collect Power Hearts</h3>
+                <p class="text-white/70 leading-relaxed">
+                  Gather special hearts to restore lives and activate powerful bonus modes
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Enhanced Gameplay Preview -->
-        <div class="relative">
-          <div class="relative mx-auto w-80 h-[500px] phone-mockup group">
-            <!-- Decorative elements -->
-            <div class="absolute -inset-6 rounded-3xl border-2 border-white/10 group-hover:border-highlight/30 transition-colors duration-500"></div>
-
-            <div class="relative w-full h-full overflow-hidden rounded-2xl">
-              <img src="./assets/images/screenshot_gameplay_1.png" alt="Gameplay Screenshot" class="w-full h-full object-contain">
-
-              <!-- Play button overlay -->
-              <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/70 via-transparent to-transparent">
-                <button id="play-video-btn" class="group/btn w-20 h-20 rounded-full bg-gradient-stellar text-cosmic-void flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-2xl">
-                  <i class="fas fa-play text-2xl ml-1 group-hover/btn:scale-110 transition-transform"></i>
-                </button>
-              </div>
-
-              <!-- Floating action indicators -->
-              <div class="absolute top-8 left-8 px-3 py-1 bg-highlight/20 backdrop-blur-sm rounded-full">
-                <span class="text-xs font-medium text-highlight">LIVE DEMO</span>
-              </div>
+        <!-- Gameplay Preview -->
+        <div class="flex justify-center">
+          <div class="phone-mockup" id="gameplayPhone">
+            <div class="phone-notch"></div>
+            <div class="phone-screen">
+              <img src="./assets/images/screenshot_gameplay_1.png" alt="Gameplay" class="w-full h-full object-cover" loading="lazy">
             </div>
           </div>
-
-          <!-- Side decoration -->
-          <div class="absolute top-1/2 -left-8 w-4 h-16 bg-gradient-cosmic rounded-full blur-2xl opacity-60 animate-pulse"></div>
-          <div class="absolute bottom-1/4 -right-6 w-3 h-12 bg-gradient-stellar rounded-full blur-xl opacity-60 animate-pulse" style="animation-delay: 1s;"></div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Enhanced Download Section -->
-  <section id="download" class="relative z-10 section">
-    <!-- Background decoration -->
-    <div class="absolute bottom-0 left-1/3 w-96 h-96 bg-gradient-cosmic rounded-full blur-3xl opacity-15" data-parallax="0.3"></div>
-
-    <div class="container mx-auto">
+  <!-- Screenshots Section -->
+  <section id="screenshots" class="relative py-32">
+    <div class="container mx-auto px-6">
       <div class="text-center mb-20">
-        <div class="inline-flex items-center px-4 py-2 rounded-full bg-highlight/10 backdrop-blur-sm border border-highlight/30 mb-6">
-          <i class="fas fa-download text-highlight mr-2"></i>
-          <span class="text-sm font-medium text-highlight">Available Now</span>
-        </div>
-        <h2 class="mb-6">
-          Start Your Cosmic <span class="text-highlight">Adventure</span>
+        <h2 class="font-display text-5xl lg:text-7xl mb-6">
+          GAME <span class="text-star-yellow text-glow-stellar">SCREENSHOTS</span>
         </h2>
-        <p class="text-xl text-white/60 max-w-2xl mx-auto">
-          Get ready for an exciting journey through the stars! Download now and begin your stellar quest
+        <p class="text-xl text-white/70 max-w-3xl mx-auto">
+          Get a glimpse of the stunning cosmic visuals and addictive gameplay
         </p>
       </div>
 
-      <!-- Enhanced Gallery Section -->
-      <div class="glass rounded-3xl p-8 mb-16 max-w-5xl mx-auto border border-white/10">
-        <div class="flex flex-col lg:flex-row justify-center items-center gap-8 mb-12">
-          <!-- First Screenshot -->
-          <div class="relative group">
-            <div class="absolute -inset-4 rounded-3xl bg-gradient-cosmic opacity-20 blur-xl group-hover:opacity-40 transition-opacity duration-300"></div>
-            <div class="relative w-72 h-[550px] rounded-3xl overflow-hidden border-2 border-white/10 shadow-2xl">
-              <img src="./assets/images/screenshot_gameplay_2.png" alt="Gameplay Screenshot" class="w-full h-full object-cover">
-              <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </div>
-          </div>
-
-          <!-- Second Screenshot -->
-          <div class="relative group">
-            <div class="absolute -inset-4 rounded-3xl bg-gradient-stellar opacity-20 blur-xl group-hover:opacity-40 transition-opacity duration-300"></div>
-            <div class="relative w-72 h-[550px] rounded-3xl overflow-hidden border-2 border-white/10 shadow-2xl">
-              <img src="./assets/images/screenshot_gameover.png" alt="Game Over Screenshot" class="w-full h-full object-cover">
-              <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      <div class="grid lg:grid-cols-2 gap-12 max-w-5xl mx-auto">
+        <!-- Screenshot 1 -->
+        <div class="screenshot-card group">
+          <div class="relative overflow-hidden rounded-3xl">
+            <div class="absolute inset-0 bg-gradient-stellar opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+            <img src="./assets/images/screenshot_gameplay_2.png" alt="Gameplay Screenshot" class="w-full h-auto" loading="lazy">
+            <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <p class="text-white font-medium">Intense Gameplay Action</p>
             </div>
           </div>
         </div>
 
-        <!-- Enhanced Divider -->
-        <div class="relative max-w-xs mx-auto mb-12">
-          <div class="h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
-          <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-            <i class="fas fa-star text-highlight"></i>
-          </div>
-        </div>
-
-        <!-- Enhanced Download Button -->
-        <div class="flex justify-center">
-          <a href="#" class="group relative btn btn-primary text-xl px-12 py-6 shadow-2xl hover:shadow-yellow-500/25">
-            <div class="absolute inset-0 bg-gradient-stellar rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <div class="relative flex items-center justify-center gap-4">
-              <i class="fab fa-google-play text-3xl"></i>
-              <div class="text-left">
-                <div class="text-xs opacity-80">GET IT ON</div>
-                <div class="text-2xl font-bold">Google Play</div>
-              </div>
+        <!-- Screenshot 2 -->
+        <div class="screenshot-card group">
+          <div class="relative overflow-hidden rounded-3xl">
+            <div class="absolute inset-0 bg-gradient-aurora opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+            <img src="./assets/images/screenshot_gameover.png" alt="Game Over Screen" class="w-full h-auto" loading="lazy">
+            <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <p class="text-white font-medium">Challenge Yourself to Beat Your High Score</p>
             </div>
-          </a>
-        </div>
-      </div>
-
-      <!-- Enhanced Features Grid -->
-      <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-        <div class="card group">
-          <div class="text-5xl mb-6 text-highlight group-hover:animate-bounce">
-            <i class="fas fa-mobile-alt"></i>
           </div>
-          <h3 class="text-2xl font-bold mb-4 group-hover:text-highlight transition-colors">Offline Play</h3>
-          <p class="text-white/70 leading-relaxed">Play anytime, anywhere without needing an internet connection. Your cosmic adventure never has to stop!</p>
-        </div>
-
-        <div class="card group">
-          <div class="text-5xl mb-6 text-highlight group-hover:animate-bounce">
-            <i class="fas fa-bolt"></i>
-          </div>
-          <h3 class="text-2xl font-bold mb-4 group-hover:text-highlight transition-colors">Fast-Paced Action</h3>
-          <p class="text-white/70 leading-relaxed">Quick gameplay sessions perfect for on-the-go entertainment. Jump in and out of stellar fun!</p>
-        </div>
-
-        <div class="card group">
-          <div class="text-5xl mb-6 text-highlight group-hover:animate-bounce">
-            <i class="fas fa-child"></i>
-          </div>
-          <h3 class="text-2xl font-bold mb-4 group-hover:text-highlight transition-colors">Fun for All Ages</h3>
-          <p class="text-white/70 leading-relaxed">Simple controls but challenging gameplay mechanics that players of all ages can enjoy and master!</p>
-        </div>
-      </div>
-
-      <!-- Additional trust indicators -->
-      <div class="flex justify-center gap-12 mt-16 text-white/60">
-        <div class="text-center">
-          <div class="text-3xl font-bold text-highlight mb-2">4.8★</div>
-          <div class="text-sm">App Rating</div>
-        </div>
-        <div class="text-center">
-          <div class="text-3xl font-bold text-highlight mb-2">100K+</div>
-          <div class="text-sm">Downloads</div>
-        </div>
-        <div class="text-center">
-          <div class="text-3xl font-bold text-highlight mb-2">50+</div>
-          <div class="text-sm">Levels</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Enhanced Footer -->
-  <footer class="relative z-10 glass border-t border-white/10">
-    <div class="container mx-auto py-12 px-6">
-      <div class="grid md:grid-cols-3 gap-12 mb-12">
-        <!-- Brand section -->
+  <!-- Download Section -->
+  <section id="download" class="relative py-32">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-20">
+        <h2 class="font-display text-5xl lg:text-7xl mb-6">
+          START YOUR <span class="text-star-yellow text-glow-stellar">COSMIC ADVENTURE</span>
+        </h2>
+        <p class="text-xl text-white/70 max-w-3xl mx-auto">
+          Ready to test your reflexes? Download now and join thousands of players in this stellar adventure!
+        </p>
+      </div>
+
+      <!-- Main Download Button -->
+      <div class="flex justify-center mb-16">
+        <a href="https://play.google.com/store/apps/details?id=com.catchfallingstar" class="btn-primary text-2xl px-12 py-6 transform transition-all hover:scale-105 group">
+          <i class="fab fa-google-play text-3xl"></i>
+          <div class="text-left">
+            <div class="text-xs opacity-80">GET IT ON</div>
+            <div class="font-display">Google Play</div>
+          </div>
+        </a>
+      </div>
+
+      <!-- Additional Features -->
+      <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16">
+        <div class="feature-card text-center">
+          <div class="text-5xl text-star-yellow mb-4">
+            <i class="fas fa-wifi-slash"></i>
+          </div>
+          <h3 class="font-display text-2xl mb-3">Offline Play</h3>
+          <p class="text-white/70">Enjoy the game anywhere without internet connection</p>
+        </div>
+
+        <div class="feature-card text-center">
+          <div class="text-5xl text-star-yellow mb-4">
+            <i class="fas fa-bolt"></i>
+          </div>
+          <h3 class="font-display text-2xl mb-3">Quick Sessions</h3>
+          <p class="text-white/70">Perfect for quick gaming breaks on the go</p>
+        </div>
+
+        <div class="feature-card text-center">
+          <div class="text-5xl text-star-yellow mb-4">
+            <i class="fas fa-users"></i>
+          </div>
+          <h3 class="font-display text-2xl mb-3">All Ages</h3>
+          <p class="text-white/70">Fun and challenging for players of all ages</p>
+        </div>
+      </div>
+
+      <!-- Trust Indicators -->
+      <div class="flex flex-wrap justify-center gap-12 text-center">
         <div>
-          <a href="index.html" class="flex items-center mb-6 group">
-            <img src="./assets/images/logo.png" alt="Catch Falling Star Logo" class="h-12 mr-4 w-auto object-contain transition-transform group-hover:scale-110">
-            <div class="text-2xl font-bold text-highlight">Catch Falling Star</div>
+          <div class="font-display text-4xl text-star-yellow mb-2">4.8★</div>
+          <div class="text-sm text-white/60">App Rating</div>
+        </div>
+        <div>
+          <div class="font-display text-4xl text-star-yellow mb-2">100K+</div>
+          <div class="text-sm text-white/60">Downloads</div>
+        </div>
+        <div>
+          <div class="font-display text-4xl text-star-yellow mb-2">50+</div>
+          <div class="text-sm text-white/60">Levels</div>
+        </div>
+        <div>
+          <div class="font-display text-4xl text-star-yellow mb-2">24/7</div>
+          <div class="text-sm text-white/60">Support</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="relative py-16 border-t border-white/10">
+    <div class="container mx-auto px-6">
+      <div class="grid md:grid-cols-3 gap-12 mb-12">
+        <!-- Brand -->
+        <div>
+          <a href="#hero" class="flex items-center space-x-3 mb-6 group">
+            <div class="w-10 h-10 rounded-full bg-gradient-stellar flex items-center justify-center">
+              <i class="fas fa-star text-cosmic-void"></i>
+            </div>
+            <span class="font-display text-xl text-star-yellow">CATCH FALLING STAR</span>
           </a>
-          <p class="text-white/60 leading-relaxed max-w-xs">
-            Embark on an extraordinary cosmic adventure where every star counts and every catch matters!
+          <p class="text-white/60 max-w-xs">
+            Your cosmic adventure awaits. Catch stars, avoid debris, and become the ultimate star catcher!
           </p>
         </div>
 
-        <!-- Quick Links -->
+        <!-- Links -->
         <div>
-          <h4 class="text-lg font-bold mb-6 text-white">Quick Links</h4>
+          <h4 class="font-display text-xl mb-6 text-white">Quick Links</h4>
           <div class="space-y-3">
-            <a href="#features" class="block text-white/60 hover:text-highlight transition-colors">Features</a>
-            <a href="#gameplay" class="block text-white/60 hover:text-highlight transition-colors">How to Play</a>
-            <a href="#download" class="block text-white/60 hover:text-highlight transition-colors">Download</a>
-            <a href="privacy-policy.html" class="block text-white/60 hover:text-highlight transition-colors">Privacy Policy</a>
+            <a href="#features" class="block text-white/60 hover:text-star-yellow transition-colors">Features</a>
+            <a href="#how-to-play" class="block text-white/60 hover:text-star-yellow transition-colors">How to Play</a>
+            <a href="#screenshots" class="block text-white/60 hover:text-star-yellow transition-colors">Screenshots</a>
+            <a href="privacy-policy.html" class="block text-white/60 hover:text-star-yellow transition-colors">Privacy Policy</a>
           </div>
         </div>
 
-        <!-- Connect -->
+        <!-- Social -->
         <div>
-          <h4 class="text-lg font-bold mb-6 text-white">Connect With Us</h4>
+          <h4 class="font-display text-xl mb-6 text-white">Connect With Us</h4>
           <div class="flex space-x-4 mb-6">
-            <a href="#" class="w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white/80 hover:bg-highlight hover:text-cosmic-void transition-all duration-300 hover:scale-110">
+            <a href="#" class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white/80 hover:bg-star-yellow hover:text-cosmic-void transition-all">
               <i class="fab fa-facebook-f"></i>
             </a>
-            <a href="#" class="w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white/80 hover:bg-highlight hover:text-cosmic-void transition-all duration-300 hover:scale-110">
+            <a href="#" class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white/80 hover:bg-star-yellow hover:text-cosmic-void transition-all">
               <i class="fab fa-twitter"></i>
             </a>
-            <a href="#" class="w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white/80 hover:bg-highlight hover:text-cosmic-void transition-all duration-300 hover:scale-110">
+            <a href="#" class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white/80 hover:bg-star-yellow hover:text-cosmic-void transition-all">
               <i class="fab fa-instagram"></i>
             </a>
-            <a href="#" class="w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white/80 hover:bg-highlight hover:text-cosmic-void transition-all duration-300 hover:scale-110">
+            <a href="#" class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white/80 hover:bg-star-yellow hover:text-cosmic-void transition-all">
               <i class="fab fa-youtube"></i>
             </a>
           </div>
           <p class="text-white/60 text-sm">
-            Follow us for updates, tips, and stellar community events!
+            Follow for updates, tips, and community events!
           </p>
         </div>
       </div>
 
-      <!-- Copyright -->
       <div class="border-t border-white/10 pt-8 text-center">
         <p class="text-white/40 text-sm">
-          &copy; 2024 Catch Falling Star. All rights reserved. Made with <span class="text-highlight">❤</span> for cosmic adventurers everywhere.
+          © 2024 Catch Falling Star. All rights reserved. Made with <span class="text-star-yellow">❤</span> for cosmic adventurers.
         </p>
       </div>
     </div>
   </footer>
-
-  <!-- Video Modal -->
-  <div id="video-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
-    <div class="absolute inset-0 bg-black/80"></div>
-    <div class="relative z-10 modal-container">
-      <!-- Phone frame design -->
-      <div class="phone-frame">
-        <!-- Phone notch -->
-        <div class="phone-notch"></div>
-        <!-- Video container with proper aspect ratio -->
-        <div class="video-container">
-          <iframe
-            src="https://www.youtube.com/embed/-YD6tOrPxQk?rel=0"
-            title="Catch Falling Star Gameplay"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-          ></iframe>
-        </div>
-        <button id="close-modal-btn" class="absolute top-4 right-4 text-white text-2xl hover:text-star-yellow transition-colors z-30">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-    </div>
-  </div>
 
   <!-- JavaScript -->
   <script src="./src/main.js"></script>
